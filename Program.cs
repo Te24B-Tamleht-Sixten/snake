@@ -17,14 +17,14 @@ namespace Snake
 		static int currentHighScore=0;
 		static int allTimeHighScore=0;
 
-		public void updateHighScore()
+		public static void updateHighScore()
 		{
 			if(File.Exists(".\\HighScore.thesixtext"))
 			{
 				string content = File.ReadAllText(".\\HighScore.thesixtext");
 				if(!Int32.TryParse(content, out allTimeHighScore))
 					File.Delete(".\\HighScore.thesixtext");
-				File.Create(".\\highscore.thesixtext");
+				File.Create(".\\HighScore.thesixtext");
 				File.WriteAllText(".\\HighScore.thesixtext", currentHighScore.ToString());
 			}
 			else
@@ -53,15 +53,15 @@ namespace Snake
 					Console.Write(' ');
 					Console.Write(' ');
 					Console.Write(' ');
-					Console.WriteLine("");
 				}
-
+					Console.WriteLine("");
+					Console.WriteLine("");
+			}
 				Console.WriteLine();
 				Console.WriteLine();
 
 				Console.WriteLine("HighScore: " + currentHighScore);
 				Console.WriteLine("AllTime: " + allTimeHighScore);
-			}
 			return true;
 		}
 
@@ -102,13 +102,16 @@ namespace Snake
 		static void SortList(int[] listPar)
 		{
 			for(int i=0; i<4; ++i)
-				for(int j=i; j<4; ++j)
-					if(i!=j)
-						if(listPar[i] == listPar[j])
-						{
-							listPar[i]=listPar[i]+listPar[j];
-							listPar[j]=0;
-						}
+				for(int j=i+1; j<4; ++j)
+				{
+					if(listPar[i]!=listPar[j]&&listPar[j]!=0)
+						break;
+					else if(listPar[i] == listPar[j])
+					{
+						listPar[i]=listPar[i]+listPar[j];
+						listPar[j]=0;
+					}
+				}
 
 
 			for(int i=0; i<4; ++i)
@@ -200,14 +203,14 @@ namespace Snake
 
 		{
 			
-			updateHighScore();
+			// updateHighScore();
 			addBlock(true, 10);
 			while(true) // gameloop
 			{
 				display();
 				if(MoveLogic())
 					addBlock(true, 10);
-				updateHighScore();
+				// updateHighScore();
 			}
 		}
 	}
