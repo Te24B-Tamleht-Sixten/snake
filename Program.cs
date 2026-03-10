@@ -65,49 +65,113 @@ namespace Snake
 			return '0';
 		}
 
-		static void MoveLogic()
+		static void SortList(int[] listPar)
 		{
-			int x=0, y=0;
-			int xDir=0, yDir=0;
+			for(int i=0; i<4; ++i)
+				for(int j=i; j<4; ++j)
+					if(i!=j)
+						if(listPar[i] == listPar[j])
+						{
+							listPar[i]=listPar[i]+listPar[j];
+							listPar[j]=0;
+						}
+			Console.WriteLine("\n");
+			Console.WriteLine(listPar[0]);
+			Console.WriteLine(listPar[1]);
+			Console.WriteLine(listPar[2]);
+			Console.WriteLine(listPar[3]);
+			Console.WriteLine("\n");
+			for(int i=0; i<4; ++i)
+				for(int j=0; j<i; ++j)
+					if(listPar[j]==0 && i!=j)
+					{
+						listPar[j]=listPar[i];
+						if(i!=j)
+						listPar[i]=0;
+					}
+			Console.WriteLine("\n");
+			Console.WriteLine(listPar[0]);
+			Console.WriteLine(listPar[1]);
+			Console.WriteLine(listPar[2]);
+			Console.WriteLine(listPar[3]);
+			Console.WriteLine("\n");
+		}
+
+		static bool MoveLogic()
+		{
+			// int x=0, y=0;
 			char move=getKey();
+			bool redo=true;
+			int[] tempLine = new int[4];
+
+			int[,] gridCopy = {
+			{0, 0, 0, 0},
+			{0, 0, 0, 0},
+			{0, 0, 0, 0},
+			{0, 0, 0, 0}
+		};
+
+			for(int x=0; x<4; ++x)
+				for(int y=0; y<4; ++y)
+					gridCopy[x,y]=grid[x,y];
+
+			while(redo)
+			{
+				redo=false;
 			if(move=='w')
 			{
-				yDir=-1;
-				y=3;
-			}
-			if(move=='s')
-			{
-				yDir=1;
-				y=0;
-			}
-			if(move=='a')
-			{
-				xDir=-1;
-				x=3;
-			}
-			if(move=='d')
-			{
-				xDir=1;
-				x=0;
-			}
-
-			int[] newLine = {0, 0, 0, 0};
-			int addedBlocks=0;
-			if(xDir!=0) 
-				for(; y<4; ++y)
+				for(int x=0; x<4; ++x)
 				{
-					for(int iX=0; iX<4; ++iX)
-						for(int i=iX-xDir; i+iX!=-1 && i+x!=4; i-=xDir)
-							if(grid[x+i,y]==grid[x,y] && grid[x,y]!=0)
-							{
-								newLine[addedBlocks++]=grid[x,y]*2;
-								grid[x+i,y]=0;
-								grid[x,y]=0;
-								break;
-							}
-					// lägg till så att newLine stoppar in i grid >:(
+					for(int i=0; i<4; ++i)
+						tempLine[i]=grid[x,i];
+					SortList(tempLine);
+					for(int i=0; i<4; ++i)
+						grid[x,i]=tempLine[i];
 				}
-			if(yDir!=0) ;
+			}
+			else if(move=='s')
+			{
+				for(int x=0; x<4; ++x)
+				{
+					for(int i=3; i>=0; --i)
+						tempLine[3-i]=grid[x,i];
+					SortList(tempLine);
+					for(int i=3; i>=0; --i)
+						grid[x,i]=tempLine[3-i];
+					display();
+				}
+			}
+			else if(move=='a')
+			{
+				for(int y=0; y<4; ++y)
+				{
+					for(int i=0; i<4; ++i)
+						tempLine[i]=grid[i,y];
+					SortList(tempLine);
+					for(int i=0; i<4; ++i)
+						grid[i,y]=tempLine[i];
+				}
+			}
+			else if(move=='d')
+			{
+				for(int y=0; y<4; ++y)
+				{
+					for(int i=3; i>=0; --i)
+						tempLine[3-i]=grid[i,y];
+					SortList(tempLine);
+					for(int i=3; i>=0; --i)
+						grid[i,y]=tempLine[3-i];
+				}
+			}
+			
+			else
+				redo=true;
+			}
+			for(int x=0; x<4; ++x)
+				for(int y=0; y<4; ++y)
+					if(gridCopy[x,y] != grid[x,y])
+						return true;
+			return false;
 		}
 		public static void Main(string[] args)
 
@@ -116,9 +180,9 @@ namespace Snake
 			addBlock(true, 10);
 			while(true) // gameloop
 			{
-				addBlock(true, 10);
 				display();
-				MoveLogic();
+				if(MoveLogic())
+					addBlock(true, 10);
 			}
 		}
 	}
