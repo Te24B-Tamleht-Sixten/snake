@@ -14,6 +14,34 @@ namespace Snake
 			{0, 0, 0, 0}
 		};
 
+		static int currentHighScore=0;
+		static int allTimeHighScore=0;
+
+		public void updateHighScore()
+		{
+			if(File.Exists(".\\HighScore.thesixtext"))
+			{
+				string content = File.ReadAllText(".\\HighScore.thesixtext");
+				if(!Int32.TryParse(content, out allTimeHighScore))
+					File.Delete(".\\HighScore.thesixtext");
+				File.Create(".\\highscore.thesixtext");
+				File.WriteAllText(".\\HighScore.thesixtext", currentHighScore.ToString());
+			}
+			else
+			{
+				File.Create(".\\HighScore.thesixtext");
+				File.WriteAllText(".\\HighScore.thesixtext", "0");
+			}
+			for(int x=0; x<4; ++x)
+				for(int y=0; y<4; ++y)
+					if(grid[x,y]>currentHighScore)
+						currentHighScore=grid[x,y];
+			if(allTimeHighScore<currentHighScore)
+			{
+				allTimeHighScore=currentHighScore;
+			}
+		}
+
 		public static bool display()
 		{
 			Console.Clear();
@@ -27,6 +55,9 @@ namespace Snake
 
 				Console.WriteLine();
 				Console.WriteLine();
+
+				Console.WriteLine("HighScore: " + currentHighScore);
+				Console.WriteLine("AllTime: " + allTimeHighScore);
 			}
 			return true;
 		}
@@ -75,12 +106,8 @@ namespace Snake
 							listPar[i]=listPar[i]+listPar[j];
 							listPar[j]=0;
 						}
-			Console.WriteLine("\n");
-			Console.WriteLine(listPar[0]);
-			Console.WriteLine(listPar[1]);
-			Console.WriteLine(listPar[2]);
-			Console.WriteLine(listPar[3]);
-			Console.WriteLine("\n");
+
+
 			for(int i=0; i<4; ++i)
 				for(int j=0; j<i; ++j)
 					if(listPar[j]==0 && i!=j)
@@ -89,17 +116,10 @@ namespace Snake
 						if(i!=j)
 						listPar[i]=0;
 					}
-			Console.WriteLine("\n");
-			Console.WriteLine(listPar[0]);
-			Console.WriteLine(listPar[1]);
-			Console.WriteLine(listPar[2]);
-			Console.WriteLine(listPar[3]);
-			Console.WriteLine("\n");
 		}
 
 		static bool MoveLogic()
 		{
-			// int x=0, y=0;
 			char move=getKey();
 			bool redo=true;
 			int[] tempLine = new int[4];
@@ -177,91 +197,15 @@ namespace Snake
 
 		{
 			
+			updateHighScore();
 			addBlock(true, 10);
 			while(true) // gameloop
 			{
 				display();
 				if(MoveLogic())
 					addBlock(true, 10);
+				updateHighScore();
 			}
 		}
 	}
 }
-
-/*
- 
-
-				while(hasMoved==false)
-				{
-					hasMoved=false;
-					for(int x=0; x<4; ++x)
-						for(int y=0; y<4; ++y)
-						{
-							if(move=='w')
-							{
-								if(y==0)
-									++y;
-								if(grid[x,y]==grid[x,y-1])
-								{
-									grid[x,y-1]*=2;
-									grid[x,y]=0;
-									hasMoved=true;
-								}
-								if(grid[x,y-1]==0 && grid[x,y]!=0)
-								{
-									grid[x,y-1]=grid[x,y];
-									grid[x,y]=0;
-									hasMoved=true;
-								}
-							}
-							else if(move=='a')
-							{
-								if(x==0)
-									++x;
-								if(grid[x,y]==grid[x-1,y])
-								{
-									grid[x-1,y]*=2;
-									grid[x,y]=0;
-									hasMoved=true;
-								}
-								if(grid[x-1,y]==0 && grid[x,y]!=0)
-								{
-									grid[x-1,y]=grid[x,y];
-									grid[x,y]=0;
-									hasMoved=true;
-								}
-							}
-							else if(move=='s' && y!=3)
-							{
-								if(grid[x,y]==grid[x,y+1])
-								{
-									grid[x,y+1]*=2;
-									grid[x,y]=0;
-									hasMoved=true;
-								}
-								if(grid[x,y+1]==0 && grid[x,y]!=0)
-								{
-									grid[x,y+1]=grid[x,y];
-									grid[x,y]=0;
-									hasMoved=true;
-								}
-							}
-							else if(move=='d' && x!=3)
-							{
-								if(grid[x,y]==grid[x+1,y])
-								{
-									grid[x+1,y]*=2;
-									grid[x,y]=0;
-									hasMoved=true;
-								}
-								if(grid[x+1,y]==0 && grid[x,y]!=0)
-								{
-									grid[x+1,y]=grid[x,y];
-									grid[x,y]=0;
-									hasMoved=true;
-								}
-							}
-						}
-					}
-
-*/
