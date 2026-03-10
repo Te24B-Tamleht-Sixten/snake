@@ -51,6 +51,9 @@ namespace Snake
 				{
 					Console.Write(grid[x,y]);
 					Console.Write(' ');
+					Console.Write(' ');
+					Console.Write(' ');
+					Console.WriteLine("");
 				}
 
 				Console.WriteLine();
