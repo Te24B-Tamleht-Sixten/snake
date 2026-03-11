@@ -1,6 +1,5 @@
 ﻿// obs detta är 2048 inte snake!!!
 
-
 namespace Snake
 {
 	class Shaft
@@ -13,30 +12,36 @@ namespace Snake
 			{0, 0, 0, 0},
 			{0, 0, 0, 0}
 		};
+		public static bool[] failedMove=[false, false, false, false];
 
 		static int currentHighScore=0;
 		static int allTimeHighScore=0;
 
 		public static void updateHighScore()
 		{
-			if(File.Exists(".\\HighScore.thesixtext"))
+			if(File.Exists(".\\HighScore"))
 			{
-				string content = File.ReadAllText(".\\HighScore.thesixtext");
+				string content = File.ReadAllText(".\\HighScore");
 				if(!Int32.TryParse(content, out allTimeHighScore))
-					File.Delete(".\\HighScore.thesixtext");
-				File.Create(".\\HighScore.thesixtext");
-				File.WriteAllText(".\\HighScore.thesixtext", currentHighScore.ToString());
+				{
+					File.Delete(".\\HighScore");
+					File.Create(".\\HighScore").Close();
+					File.WriteAllText(".\\HighScore", currentHighScore.ToString()+Environment.NewLine);
+				}
+				else if(allTimeHighScore<currentHighScore)
+					File.WriteAllText(".\\HighScore", currentHighScore.ToString()+Environment.NewLine);
+
 			}
 			else
 			{
-				File.Create(".\\HighScore.thesixtext");
-				File.WriteAllText(".\\HighScore.thesixtext", "0");
+				File.Create(".\\HighScore").Close();
+				File.WriteAllText(".\\HighScore", "0"+Environment.NewLine);
 			}
 			for(int x=0; x<4; ++x)
 				for(int y=0; y<4; ++y)
 					if(grid[x,y]>currentHighScore)
 						currentHighScore=grid[x,y];
-			if(allTimeHighScore<currentHighScore)
+			if(allTimeHighScore<=currentHighScore)
 			{
 				allTimeHighScore=currentHighScore;
 			}
@@ -45,23 +50,112 @@ namespace Snake
 		public static bool display()
 		{
 			Console.Clear();
+
+				Console.ForegroundColor=ConsoleColor.Black;
+				
+				for(int i = 0; i<13; ++i)
+					Console.Write(' ');
+				Console.BackgroundColor=ConsoleColor.White;
+				Console.WriteLine("HighScore: " + currentHighScore + "  AllTime: " + allTimeHighScore);
+				Console.BackgroundColor=ConsoleColor.Black;
+
+			Console.ForegroundColor=ConsoleColor.DarkCyan;
+			for(int i = 0; i<17; ++i)
+				Console.Write(' ');
+			for(int i=0; i<9; ++i)
+			{
+				Console.Write('-');
+				Console.Write(' ');
+				
+			}
+			Console.WriteLine("");
 			for(int y=0; y<4; ++y)
 			{
+				for(int i = 0; i<17; ++i)
+					Console.Write(' ');
+				Console.Write('|');
 				for(int x=0; x<4; ++x)
-				{
-					Console.Write(grid[x,y]);
-					Console.Write(' ');
-					Console.Write(' ');
-					Console.Write(' ');
-				}
-					Console.WriteLine("");
-					Console.WriteLine("");
-			}
-				Console.WriteLine();
-				Console.WriteLine();
+				{	
+					if(grid[x,y]<10 && x==3)	
+						Console.Write(' ');
+					if(grid[x,y]<1000 && x!=3)
+						Console.Write(' ');
+					switch(grid[x,y])
+					{
+						case 2:
+							Console.ForegroundColor=ConsoleColor.White;
+							break;
+						case 4:
+							Console.ForegroundColor=ConsoleColor.Yellow;
+							break;
+						case 8:
+							Console.ForegroundColor=ConsoleColor.Green;
+							break;
+						case 16:
+							Console.ForegroundColor=ConsoleColor.Red;
+							break;
+						case 32:
+							Console.ForegroundColor=ConsoleColor.DarkBlue;
+							break;
+						case 64:
+							Console.ForegroundColor=ConsoleColor.Magenta;
+							break;
+						case 128:
+							Console.ForegroundColor=ConsoleColor.DarkRed;
+							break;
+						case 256:
+							Console.ForegroundColor=ConsoleColor.Gray;
+							break;
+						case 512:
+							Console.ForegroundColor=ConsoleColor.DarkMagenta;
+							break;
+						case 1024:
+							Console.ForegroundColor=ConsoleColor.DarkYellow;
+							break;
+						default:
+							Console.ForegroundColor=ConsoleColor.Blue;
+							break;
+					}
+					if(grid[x,y]!=0)
+						Console.Write(grid[x,y]);
+					else
+						Console.Write(' ');
+					if(grid[x,y]<100 && x==3)	
+						Console.Write(' ');
+					if(grid[x,y]>10 && grid[x,y] <1000&& x==3)	
+						Console.Write(' ');
+					if(x!=3)
+					{
+						if(grid[x,y]<10)
+							Console.Write(' ');
 
-				Console.WriteLine("HighScore: " + currentHighScore);
-				Console.WriteLine("AllTime: " + allTimeHighScore);
+					if(grid[x,y]<100)
+						Console.Write(' ');
+					}
+					else
+						if(grid[x,y]<=10)
+							Console.Write(' ');
+					
+
+				}
+				Console.ForegroundColor=ConsoleColor.DarkCyan;
+				Console.Write('|');
+				if(y!=3)
+				{
+					Console.WriteLine("");
+					Console.WriteLine("");
+					Console.WriteLine("");
+				}
+			}
+			Console.WriteLine("");
+			for(int i = 0; i<17; ++i)
+				Console.Write(' ');
+			for(int i=0; i<9; ++i) {
+				Console.Write('-');
+				Console.Write(' ');
+			}
+
+
 			return true;
 		}
 
@@ -73,8 +167,7 @@ namespace Snake
 			{
 				x = rand.Next(4);
 				y = rand.Next(4);
-				if(grid[x,y]==0)
-					break;
+				if(grid[x,y]==0) break;
 			}
 
 			if(rand.Next(1, 101) <= chanseFor4 && canGive4)
@@ -86,6 +179,8 @@ namespace Snake
 		public static char getKey()
 		{
 			ConsoleKeyInfo buttonPress;
+			while(true)
+			{
 			buttonPress=Console.ReadKey();
 			if(buttonPress.Key == ConsoleKey.W)
 				return 'w';
@@ -95,8 +190,7 @@ namespace Snake
 				return 's';
 			if(buttonPress.Key == ConsoleKey.D)
 				return 'd';
-
-			return '0';
+			}
 		}
 
 		static void SortList(int[] listPar)
@@ -124,18 +218,27 @@ namespace Snake
 					}
 		}
 
-		static bool MoveLogic()
+		static void resetFail()
+		{
+			failedMove[0]=false;
+			failedMove[1]=false;
+			failedMove[2]=false;
+			failedMove[3]=false;
+		}
+
+		static bool moveLogic()
 		{
 			char move=getKey();
 			bool redo=true;
 			int[] tempLine = new int[4];
 
-			int[,] gridCopy = {
-			{0, 0, 0, 0},
-			{0, 0, 0, 0},
-			{0, 0, 0, 0},
-			{0, 0, 0, 0}
-		};
+			int[,] gridCopy = 
+			{
+				{0, 0, 0, 0},
+				{0, 0, 0, 0},
+				{0, 0, 0, 0},
+				{0, 0, 0, 0}
+			};
 
 			for(int x=0; x<4; ++x)
 				for(int y=0; y<4; ++y)
@@ -179,6 +282,7 @@ namespace Snake
 				}
 			}
 			else if(move=='d')
+
 			{
 				for(int y=0; y<4; ++y)
 				{
@@ -191,26 +295,48 @@ namespace Snake
 			}
 			
 			else
+			{
 				redo=true;
+			}
 			}
 			for(int x=0; x<4; ++x)
 				for(int y=0; y<4; ++y)
 					if(gridCopy[x,y] != grid[x,y])
+					{
+						resetFail();
 						return true;
+					}
+
+			if(move=='w')
+				failedMove[0]=true;
+			if(move=='a')
+				failedMove[1]=true;
+			if(move=='s')
+				failedMove[2]=true;
+			if(move=='d')
+				failedMove[3]=true;
+
+			if(failedMove[0] && failedMove[1] && failedMove[2] && failedMove[3])
+			{
+				Console.BackgroundColor=ConsoleColor.Black;
+				Console.ForegroundColor=ConsoleColor.Cyan;
+				Console.WriteLine("\n\ndu fick: " + currentHighScore + " som mest");
+				System.Environment.Exit(1);
+			}
 			return false;
 		}
 		public static void Main(string[] args)
 
 		{
 			
-			// updateHighScore();
+			updateHighScore();
 			addBlock(true, 10);
 			while(true) // gameloop
 			{
 				display();
-				if(MoveLogic())
+				if(moveLogic())
 					addBlock(true, 10);
-				// updateHighScore();
+				updateHighScore();
 			}
 		}
 	}
