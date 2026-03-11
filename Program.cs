@@ -1,22 +1,30 @@
-﻿// obs detta är 2048 inte snake!!!
-
-namespace Snake
+﻿namespace TwoThousandFourtyEight
 {
 	class Shaft
 	{
+		/*
+		 * needed for non reapeating nummbers*/
 		static Random rand = new Random(Guid.NewGuid().GetHashCode()); // random number with a "random" seed
 
+		/*
+		 * used to store data for most of computation and display*/
 		static int[,] grid = {
 			{0, 0, 0, 0},
 			{0, 0, 0, 0},
 			{0, 0, 0, 0},
 			{0, 0, 0, 0}
 		};
+
+		/*
+		 * used to store if a moved failed and if all fail there are no possible moves left. 0 w, 1 a, 2 s, 3 d*/
 		public static bool[] failedMove=[false, false, false, false];
 
 		static int currentHighScore=0;
 		static int allTimeHighScore=0;
 
+
+		/*
+		 * Read in a file and updated highscore, if the file doesent exist it makes one */
 		public static void updateHighScore()
 		{
 			if(File.Exists(".\\HighScore"))
@@ -47,6 +55,8 @@ namespace Snake
 			}
 		}
 
+		/*
+		 * displays through changing terminal color and then typing the nummber to the screen one at a time, very simple print algorithm 👍 */
 		public static bool display()
 		{
 			Console.Clear();
@@ -176,6 +186,8 @@ namespace Snake
 				grid[x,y]=2; 
 		}
 
+		/*
+		 * gets key and returns the wasd equivalent for future processing*/
 		public static char getKey()
 		{
 			ConsoleKeyInfo buttonPress;
@@ -193,6 +205,8 @@ namespace Snake
 			}
 		}
 
+		/*
+		 * takes a list that is sorted by paris them removes spaces. This is for the stacking effekt of the game*/
 		static void SortList(int[] listPar)
 		{
 			for(int i=0; i<4; ++i)
@@ -218,6 +232,8 @@ namespace Snake
 					}
 		}
 
+		/*
+		 * resets the fail counter so the game doesent end prematurly*/
 		static void resetFail()
 		{
 			failedMove[0]=false;
@@ -226,6 +242,8 @@ namespace Snake
 			failedMove[3]=false;
 		}
 
+		/*
+		 * Returns 1 if the game can continiue. Takes care of all movement through sortList() function. Also takes care of if the failscreen and its trigger.*/
 		static bool moveLogic()
 		{
 			char move=getKey();
@@ -329,12 +347,12 @@ namespace Snake
 
 		{
 			
-			updateHighScore();
-			addBlock(true, 10);
+			updateHighScore(); // makes you see you all time highscore in the start
+			addBlock(true, 10); // starter so the game can start
 			while(true) // gameloop
 			{
-				display();
-				if(moveLogic())
+				display(); // shows the first block and continues to display after
+				if(moveLogic()) // unless moveLogic returns 1 it wont allow the program to add another block.
 					addBlock(true, 10);
 				updateHighScore();
 			}
